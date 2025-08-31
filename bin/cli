@@ -50,7 +50,7 @@ const generate = (fileName, fileType) => {
   }
 };
 
-const [,, type, name] = process.argv;
+const [, , type, name] = process.argv;
 const valideType = [
   'controller', 'c',
   'service', 's',

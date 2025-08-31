@@ -1,4 +1,5 @@
-const { router } = require('../../configs/app.config');
+const { Router } = require('express');
+const router = Router();
 
 const xApiKeyController = require('../../src/controllers/admin/x-api-key.controller');
 

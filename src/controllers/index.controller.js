@@ -22,9 +22,9 @@ class IndexController extends BaseController {
       return IndexController.instance;
     }
 
-    welcom (req, res, next) {
+    welcome(req, res, next) {
 
-      return super.success(res, 'Welcom', configs.getAppInfo());
+      return super.success(res, 'Welcome', configs.getAppInfo());
     }
 }
 

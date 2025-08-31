@@ -28,19 +28,19 @@ class MailService {
 
     constructor(userQueue, settings, templateConfig) {
 
-      if (MailService.instance) return MailService.instance;
+        if (MailService.instance) return MailService.instance;
 
-      this.settings = settings;
+        this.settings = settings;
 
-      if (Object.keys(this.settings).length !== 0) {
+        if (Object.keys(this.settings).length !== 0) {
 
-        this.isMailActive = true;
-      } 
+            this.isMailActive = true;
+        }
 
-      this.userQueue = userQueue;
-      this.templateConfig = templateConfig;
-      this.queue = QueueService.getInstance('mailQueue');
-      MailService.instance = this;
+        this.userQueue = userQueue;
+        this.templateConfig = templateConfig;
+        this.queue = QueueService.getInstance('mailQueue');
+        MailService.instance = this;
     }
 
     /**
@@ -48,23 +48,23 @@ class MailService {
      */
     static getInstance(userQueue, settings, templateConfig) {
 
-      if (!MailService.instance) MailService.instance = new MailService(userQueue, settings, templateConfig);
+        if (!MailService.instance) MailService.instance = new MailService(userQueue, settings, templateConfig);
 
-      return MailService.instance;
+        return MailService.instance;
     }
 
-    transporter () {
+    transporter() {
 
         if (!this.transport) this.transport = nodemailer.createTransport(this.settings);
 
         return this.transport;
     }
 
-    async mail (receivers, subject, content, html =  null, sender = null) {
+    async mail(receivers, subject, content, html = null, sender = null, attachments = []) {
 
         if (!this.isMailActive) {
 
-            throw new Error("Please enabled mail service in .env file");
+            throw new Error("Please enable mail service in .env file");
         }
 
         try {
@@ -73,7 +73,7 @@ class MailService {
                 from: '"' + sender.name + '" <' + sender.email + '>',
                 to: receivers,
                 subject: subject
-            }
+            };
 
             if (html) {
 
@@ -82,6 +82,10 @@ class MailService {
             } else {
 
                 data['text'] = content;
+            }
+
+            if (attachments.length > 0) {
+                data['attachments'] = attachments;
             }
 
             await this.transporter().sendMail(data);
@@ -100,12 +104,13 @@ class MailService {
      * @param { String } content  Content of the mail (Messgae or path to a file in templates folder)
      * @param { Ojbect | Null } html 
      * @param {*} sender 
+     * @param { Array } attachments
      * @returns 
      */
-    send (receivers, subject, content, html = null, sender = null) {
+    send(receivers, subject, content, html = null, sender = null, attachments = []) {
 
         const user = sender || { email: this.settings.senderEmail, name: this.settings.senderName };
-        return this.mail(receivers, subject, content, html, user);
+        return this.mail(receivers, subject, content, html, user, attachments);
     }
 
     /**
@@ -115,19 +120,19 @@ class MailService {
      * @param { String } content  Content of the mail (Messgae or path to a file in templates folder)
      * @param { Ojbect | Null } html 
      * @param {*} sender 
+     * @param { Array } attachments
      * @returns { void }
      */
-    sendWithQueue (receivers, subject, content, html = null, sender = null) {
+    sendWithQueue(receivers, subject, content, html = null, sender = null, attachments = []) {
 
         if (this.userQueue) {
-            
-            this.queue.add({ type: 'mail', data: { receivers, subject, content, html, sender } });
+            this.queue.add({ type: 'mail', data: { receivers, subject, content, html, sender, attachments } });
         } else {
-            this.send(receivers, subject, content, html, sender);
+            this.send(receivers, subject, content, html, sender, attachments);
         }
     }
 
-    processQueue () {
+    processQueue() {
 
         this.queue.getQueue().process(async (job, done) => {
 
@@ -135,8 +140,12 @@ class MailService {
             const { type, data } = job.data;
             if (type === 'mail') {
 
-                const { receivers, subject, content, html, sender } = data;
-                await this.send(receivers, subject, content, html, sender);
+                const { receivers, subject, content, html, sender, attachments } = data;
+
+                console.log("DATA: ", data);
+                console.log(`Sending mail to: ${receivers}`);
+
+                await this.send(receivers, subject, content, html, sender, attachments);
             }
 
             done();
@@ -145,11 +154,15 @@ class MailService {
         this.queue.getQueue().on('failed', (job, error) => {
             console.error(`Échec de la tâche ${job.id}:`, error);
         });
-        
+
         this.queue.getQueue().on('error', (error) => {
             console.error('Erreur dans la file d\'attente:', error);
         });
     }
 }
 
-module.exports = MailService.getInstance(configs.use('QUEUE'), configs.getMailSettings(), templateConfig);
+module.exports = MailService.getInstance(
+    configs.use('QUEUE'),
+    configs.getMailSettings(),
+    templateConfig
+);

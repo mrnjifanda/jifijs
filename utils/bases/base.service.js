@@ -13,7 +13,10 @@ class BaseService {
         this.model = model;
     }
 
-    mail () {
+    /**
+     * @returns { MailService }
+     */
+    mail() {
         return mailService;
     }
 
@@ -47,10 +50,10 @@ class BaseService {
         return jwt.sign(data, SECRET_TOKEN, { expiresIn });
     }
 
-    tokenVerify (token) {
+    tokenVerify(token) {
 
         try {
-        
+
             return jwt.verify(token, SECRET_TOKEN)
         } catch (error) {
 
@@ -118,10 +121,6 @@ class BaseService {
 
             const results = await mongooseQuery;
 
-            // const results = (Object.keys(query).length != 0 && query.select)
-            //     ? await use_model[method](filter).select(this.querySelect(query.select))
-            //     : await use_model[method](filter);
-
             return {
                 error: false,
                 data: results
@@ -141,7 +140,7 @@ class BaseService {
         return this.defaultFind('find', filter, query, model);
     }
 
-    async paginate(filters, page = 1, limit = 10, model = null) {
+    async paginate(filters, page = 1, limit = 10, model = null, populate = null) {
 
         try {
 
@@ -149,16 +148,31 @@ class BaseService {
             const total = await this.count(filters, model);
             if (total) {
 
-                find = await this.getModel(model).find(filters)
-                    .limit(parseInt(limit))
-                    .skip(limit * page)
+                const parsePage = page == 0 ? 0 : parseInt(page) - 1;
+                const parseLimit = parseInt(limit);
+                const offset = parsePage * parseLimit;
+                let query = this.getModel(model).find(filters)
+                    .limit(parseLimit)
+                    .skip(offset)
                     .sort({ created_at: 'desc' });
+
+                if (populate) {
+                    if (Array.isArray(populate)) {
+                        populate.forEach(populateField => {
+                            query = query.populate(populateField);
+                        });
+                    } else {
+                        query = query.populate(populate);
+                    }
+                }
+
+                find = await query;
             }
 
             return {
                 error: false,
                 data: {
-                    paginate: { total, page, limit },
+                    paginate: { total, page: parseInt(page), limit: parseInt(limit) },
                     content: find
                 },
             };
@@ -236,7 +250,36 @@ class BaseService {
         }
     }
 
-    async count (filter, model = null) {
+    /**
+     * Performs a logical deletion of an item by updating the `deleted_at` field with the current date.
+     * @param {Object} filter - The filter criteria to identify the item to delete.
+     * @param {Object|null} model - The model to use for the update (optional).
+     * @returns {Promise<Object>} - Returns an object containing the update result and a message.
+     * @throws {Error} - Throws an error if the filter is invalid or if an exception occurs.
+    */
+    async softDelete(filter, model = null) {
+        try {
+            if (!filter || typeof filter !== 'object') {
+                throw new Error('Invalid filter parameter');
+            }
+
+            const deleteData = { deleted_at: new Date() };
+            const result = await this.update(filter, deleteData, model);
+            return {
+                ...result,
+                message: result.error ? result.message : "Item successfully soft deleted"
+            };
+        } catch (error) {
+            console.error(error);
+            return {
+                error: true,
+                message: error.message,
+                name: error.name
+            };
+        }
+    }
+
+    async count(filter, model = null) {
 
         return this.getModel(model).countDocuments(filter);
     }

@@ -1,4 +1,4 @@
-const { express, response, configs, ALLOWED_METHODS, path, morgan } = require('./configs/app.config');
+const { express, response, configs, ALLOWED_METHODS, path, morgan, cookie_parser } = require('./configs/app.config');
 
 const cors = require('cors');
 const routes = require('./routes');
@@ -14,6 +14,7 @@ app.use(cors({ credentials: true, origin: allowedOrigins, optionsSuccessStatus: 
 
 if (configs.use('database')) db.connect(configs.getDatabase());
 
+app.use(cookie_parser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
