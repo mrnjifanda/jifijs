@@ -1,0 +1,49 @@
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td align="center">
+            <h1 style="margin: 0 0 16px 0; font-size: 28px; font-weight: 700; color: #1e293b; line-height: 1.2;">Security Alert</h1>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #475569;">Hello <strong style="font-weight: 600; color: #1e293b;">{{ user.first_name }} {{ user.last_name }}</strong>,</p>
+            <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #475569;">Unauthorized access to your account was reported. We've taken immediate action to protect your account.</p>
+        </td>
+    </tr>
+</table>
+
+<!-- Danger Alert -->
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0;">
+    <tr>
+        <td style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 20px 24px; border-radius: 12px;">
+            <p style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #991b1b;">Actions Taken</p>
+            <p style="margin: 4px 0 0 0; font-size: 15px; line-height: 1.6; color: #991b1b;">All sessions terminated and access tokens invalidated.</p>
+        </td>
+    </tr>
+</table>
+
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td>
+            <h2 style="margin: 32px 0 16px 0; font-size: 22px; font-weight: 600; color: #334155; line-height: 1.3;">Next Steps</h2>
+            <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #475569;">Reset your password immediately to regain access.</p>
+        </td>
+    </tr>
+</table>
+
+<!-- Danger Button -->
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="border-radius: 12px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);">
+                        <a href="{{concat app_settings.url '/auth/forgot-password'}}" style="display: inline-block; padding: 16px 36px; font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 12px; letter-spacing: 0.3px;">Reset Password</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<p style="margin: 24px 0 0 0; font-size: 14px; color: #64748b;">Alert triggered: {{formatDate alertDate "DD/MM/YYYY HH:mm"}}</p>

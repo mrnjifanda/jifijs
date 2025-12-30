@@ -2,72 +2,200 @@
 
 const fs = require('fs');
 const path = require('path');
-const templates = require('./templates');
+const templates = require('./templates.js');
 
 const ucfirst = str => str.charAt(0).toUpperCase() + str.slice(1);
+const kebabToCamel = str => str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 
 const getType = type => {
   const types = {
+    't': 'type',
     'c': 'controller',
     'm': 'model',
     's': 'service',
-    'r': 'resource'
+    'r': 'route',
+    'v': 'validation',
+    'resource': 'resource',
+    'all': 'all'
   };
   return types[type] || type;
 };
 
 const generateFile = (dirPath, fileName, template) => {
-
   if (!fs.existsSync(dirPath)) {
-
     fs.mkdirSync(dirPath, { recursive: true });
   }
 
-  fs.writeFileSync(path.join(dirPath, fileName), template, 'utf8');
+  const filePath = path.join(dirPath, fileName);
+
+  if (fs.existsSync(filePath)) {
+    console.warn(`⚠️  File ${fileName} already exists. Skipping...`);
+    return false;
+  }
+
+  fs.writeFileSync(filePath, template, 'utf8');
+  return true;
 };
 
-const generate = (fileName, fileType) => {
-
-  const FileName = ucfirst(fileName);
+const generate = (fileName, fileType, folder = 'app') => {
+  const camelName = kebabToCamel(fileName);
+  const FileName = ucfirst(camelName);
   const fileTypeLower = fileType.toLowerCase();
 
-  if (fileTypeLower === 'resource') {
+  console.log(`\n🚀 Generating ${fileTypeLower} for "${fileName}" in "${folder}" folder...\n`);
 
-    ['controller', 'model', 'service'].forEach(type => {
-      const dirPath = path.join(__dirname, `../src/${type}s`);
-      const filePath = `${fileName}.${type}.js`;
-      const template = templates[type](FileName);
-      generateFile(dirPath, filePath, template);
-      console.log(`${ucfirst(type)} ${filePath} created successfully`);
-    });
-  } else {
+  const componentsToGenerate = fileTypeLower === 'resource' || fileTypeLower === 'all'
+    ? ['type', 'model', 'service', 'controller', 'route', 'validation']
+    : [fileTypeLower];
 
-    const dirPath = path.join(__dirname, `../src/${fileTypeLower}s`);
-    const filePath = `${fileName}.${fileTypeLower}.js`;
-    const template = templates[fileTypeLower](FileName);
-    generateFile(dirPath, filePath, template);
-    console.log(`${ucfirst(fileTypeLower)} ${filePath} created successfully`);
+  const results = {
+    success: [],
+    skipped: [],
+    errors: []
+  };
+
+  componentsToGenerate.forEach(type => {
+    try {
+      let dirPath, filePath, template;
+
+      switch (type) {
+        case 'type':
+          dirPath = path.join(__dirname, '../src/types');
+          filePath = `${fileName}.types.ts`;
+          template = templates.type(FileName, fileName);
+          break;
+
+        case 'controller':
+          dirPath = path.join(__dirname, `../src/controllers/${folder}`);
+          filePath = `${fileName}.controller.ts`;
+          template = templates.controller(FileName, fileName, folder);
+          break;
+
+        case 'service':
+          dirPath = path.join(__dirname, `../src/services/${folder}`);
+          filePath = `${fileName}.service.ts`;
+          template = templates.service(FileName, fileName, folder);
+          break;
+
+        case 'model':
+          dirPath = path.join(__dirname, '../src/models');
+          filePath = `${fileName}.model.ts`;
+          template = templates.model(FileName, fileName);
+          break;
+
+        case 'route':
+          dirPath = path.join(__dirname, `../routes/${folder}`);
+          filePath = `${fileName}.route.ts`;
+          template = templates.route(FileName, fileName, folder);
+          break;
+
+        case 'validation':
+          dirPath = path.join(__dirname, '../utils/validations');
+          filePath = `${fileName}.validation.ts`;
+          template = templates.validation(FileName, fileName);
+          break;
+
+        default:
+          throw new Error(`Unknown type: ${type}`);
+      }
+
+      const created = generateFile(dirPath, filePath, template);
+
+      if (created) {
+        results.success.push(`✅ ${ucfirst(type)}: ${dirPath.split('express-backend-ts/')[1]}/${filePath}`);
+      } else {
+        results.skipped.push(`⏭️  ${ucfirst(type)}: ${filePath}`);
+      }
+
+    } catch (error) {
+      results.errors.push(`❌ ${ucfirst(type)}: ${error.message}`);
+    }
+  });
+
+  // Display results
+  if (results.success.length > 0) {
+    console.log('Created files:');
+    results.success.forEach(msg => console.log(msg));
   }
+
+  if (results.skipped.length > 0) {
+    console.log('\nSkipped files:');
+    results.skipped.forEach(msg => console.log(msg));
+  }
+
+  if (results.errors.length > 0) {
+    console.log('\nErrors:');
+    results.errors.forEach(msg => console.log(msg));
+  }
+
+  console.log('\n✨ Generation complete!\n');
 };
 
-const [, , type, name] = process.argv;
-const valideType = [
+// Parse command line arguments
+const args = process.argv.slice(2);
+let type, name, folder = 'app';
+
+// Parse flags
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--folder' || args[i] === '-f') {
+    folder = args[i + 1];
+    args.splice(i, 2);
+    i--;
+  }
+}
+
+[type, name] = args;
+
+const validTypes = [
+  'type', 't',
   'controller', 'c',
   'service', 's',
   'model', 'm',
-  'resource', 'r'
+  'route', 'r',
+  'validation', 'v',
+  'resource', 'all'
 ];
 
-if (!type || !valideType.includes(type)) {
+const validFolders = ['app', 'admin', 'auth'];
 
-  console.error('Please enter a valid type');
+if (!type || !validTypes.includes(type)) {
+  console.error(`
+❌ Please enter a valid type
+
+Usage:
+  npm run g <type> <name> [--folder <folder>]
+
+Types:
+  t, type          Generate a TypeScript interface/type
+  c, controller    Generate a controller
+  s, service       Generate a service
+  m, model         Generate a model
+  r, route         Generate a route
+  v, validation    Generate a validation
+  resource         Generate type, model, service, controller, route, and validation
+  all              Generate all files (same as resource)
+
+Options:
+  --folder, -f     Specify folder (app, admin, auth). Default: app
+
+Examples:
+  npm run g c product
+  npm run g resource product
+  npm run g all product --folder admin
+  npm run g controller user -f auth
+  npm run g t product
+  `);
   process.exit(1);
 }
 
 if (!name) {
-
-  console.error('Please enter a valid name');
+  console.error('❌ Please enter a valid name');
   process.exit(1);
 }
 
-generate(name, getType(type));
+if (!validFolders.includes(folder)) {
+  console.error(`❌ Invalid folder: ${folder}. Valid folders: ${validFolders.join(', ')}`);
+  process.exit(1);
+}
+
+generate(name, getType(type), folder);

@@ -1,0 +1,81 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    /* Modules */
+    "module": "commonjs",
+    "rootDir": ".",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@configs/*": ["./configs/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@services/*": ["./src/services/*"],
+      "@models/*": ["./src/models/*"],
+      "@utils/*": ["./utils/*"],
+      "@types/*": ["./src/types/*"],
+      "@routes/*": ["./routes/*"]
+    },
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+
+    /* JavaScript Support */
+    "allowJs": true,
+    "checkJs": false,
+
+    /* Emit */
+    "outDir": "./dist",
+    "removeComments": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+
+    /* Completeness */
+    "skipLibCheck": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "public",
+    "docs"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "transpileOnly": true,
+    "files": true
+  }
+}

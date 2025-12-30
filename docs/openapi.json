@@ -1,0 +1,3657 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API BASE",
+    "version": "1.0.0",
+    "description": "API de base pour la gestion de l'authentification et des logs.",
+    "license": {
+      "name": "MIT",
+      "url": "https://spdx.org/licenses/MIT.html"
+    },
+    "contact": {
+      "name": "Mr NJIFANDA",
+      "url": "https://njifanda.com",
+      "email": "contact@njifanda.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Base - API (mode: Development)"
+    }
+  ],
+  "paths": {
+    "/admin/logs/queue/{service}": {
+      "get": {
+        "tags": [
+          "Admin - Logs"
+        ],
+        "summary": "Get queue information for a service",
+        "description": "Retrieve queue status and pending jobs for a specific service",
+        "operationId": "getLogsQueue",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Service name (e.g., mail, sms)",
+            "schema": {
+              "type": "string",
+              "example": "mail"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/logs/statistics": {
+      "get": {
+        "tags": [
+          "Admin - Logs"
+        ],
+        "summary": "Get logs statistics",
+        "description": "Retrieve comprehensive statistics about system logs",
+        "operationId": "getLogsStatistics",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Start date for statistics (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "End date for statistics (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/logs": {
+      "get": {
+        "tags": [
+          "Admin - Logs"
+        ],
+        "summary": "List all logs",
+        "description": "Retrieve all system logs with pagination and filters",
+        "operationId": "getAllLogs",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          },
+          {
+            "name": "method",
+            "in": "query",
+            "description": "HTTP method filter",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            }
+          },
+          {
+            "name": "status_code",
+            "in": "query",
+            "description": "HTTP status code filter",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Start date filter",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "End date filter",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/logs/errors": {
+      "get": {
+        "tags": [
+          "Admin - Logs"
+        ],
+        "summary": "List error logs",
+        "description": "Retrieve all logs with status code >= 400",
+        "operationId": "getErrorLogs",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/logs/user/{userId}": {
+      "get": {
+        "tags": [
+          "Admin - Logs"
+        ],
+        "summary": "Get user activity logs",
+        "description": "Retrieve all logs for a specific user",
+        "operationId": "getUserActivityLogs",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/logs/{id}": {
+      "get": {
+        "tags": [
+          "Admin - Logs"
+        ],
+        "summary": "Get log by ID",
+        "description": "Retrieve detailed information about a specific log entry",
+        "operationId": "getLogById",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Log entry ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/logs/cleanup": {
+      "post": {
+        "tags": [
+          "Admin - Logs"
+        ],
+        "summary": "Cleanup old logs",
+        "description": "Delete logs older than specified days or based on filters",
+        "operationId": "cleanupLogs",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "days": {
+                    "type": "integer",
+                    "description": "Delete logs older than X days",
+                    "example": 30
+                  },
+                  "status_code": {
+                    "type": "integer",
+                    "description": "Delete logs with specific status code",
+                    "example": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/mail-queue/stats": {
+      "get": {
+        "tags": [
+          "Admin - Mail Queue"
+        ],
+        "summary": "Get mail queue statistics",
+        "description": "Retrieve comprehensive statistics about the mail queue including waiting, active, completed, and failed jobs",
+        "operationId": "getMailQueueStats",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Queue statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Mail queue statistics retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "waiting": {
+                          "type": "integer",
+                          "description": "Number of jobs waiting to be processed",
+                          "example": 5
+                        },
+                        "active": {
+                          "type": "integer",
+                          "description": "Number of jobs currently being processed",
+                          "example": 1
+                        },
+                        "delayed": {
+                          "type": "integer",
+                          "description": "Number of delayed jobs",
+                          "example": 0
+                        },
+                        "completed": {
+                          "type": "integer",
+                          "description": "Number of completed jobs",
+                          "example": 150
+                        },
+                        "failed": {
+                          "type": "integer",
+                          "description": "Number of failed jobs",
+                          "example": 3
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/mail-queue/failed": {
+      "get": {
+        "tags": [
+          "Admin - Mail Queue"
+        ],
+        "summary": "Get all failed mail jobs",
+        "description": "Retrieve detailed information about all failed email jobs in the queue",
+        "operationId": "getFailedMailJobs",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Failed jobs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Found 3 failed mail jobs"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "123"
+                          },
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "example": "mail"
+                              },
+                              "data": {
+                                "type": "object",
+                                "properties": {
+                                  "receivers": {
+                                    "type": "string",
+                                    "example": "user@example.com"
+                                  },
+                                  "subject": {
+                                    "type": "string",
+                                    "example": "Welcome to our platform"
+                                  },
+                                  "content": {
+                                    "type": "string",
+                                    "example": "auth/activation"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "failedReason": {
+                            "type": "string",
+                            "example": "SMTP_UNREACHABLE: ECONNREFUSED: connect ECONNREFUSED 127.0.0.1:1025"
+                          },
+                          "attemptsMade": {
+                            "type": "integer",
+                            "example": 3
+                          },
+                          "timestamp": {
+                            "type": "integer",
+                            "example": 1234567890
+                          },
+                          "processedOn": {
+                            "type": "integer",
+                            "example": 1234567900
+                          },
+                          "finishedOn": {
+                            "type": "integer",
+                            "example": 1234567910
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/mail-queue/retry/{jobId}": {
+      "post": {
+        "tags": [
+          "Admin - Mail Queue"
+        ],
+        "summary": "Retry a specific failed job",
+        "description": "Queue a specific failed mail job for retry. The job will be reprocessed with the same data.",
+        "operationId": "retryMailJob",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the job to retry",
+            "schema": {
+              "type": "string",
+              "example": "123"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job queued for retry successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Job 123 queued for retry"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "jobId": {
+                          "type": "string",
+                          "example": "123"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/mail-queue/retry-all": {
+      "post": {
+        "tags": [
+          "Admin - Mail Queue"
+        ],
+        "summary": "Retry all failed jobs",
+        "description": "Queue all failed mail jobs for retry. Useful when SMTP server becomes available after an outage.",
+        "operationId": "retryAllMailJobs",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All failed jobs queued for retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Retried 3 failed mail jobs"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "retriedCount": {
+                          "type": "integer",
+                          "example": 3
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/mail-queue/failed/{jobId}": {
+      "delete": {
+        "tags": [
+          "Admin - Mail Queue"
+        ],
+        "summary": "Remove a failed job",
+        "description": "Permanently remove a specific failed job from the queue. This action cannot be undone.",
+        "operationId": "removeMailJob",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the job to remove",
+            "schema": {
+              "type": "string",
+              "example": "123"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job removed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Job 123 removed successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/mail-queue/clean": {
+      "post": {
+        "tags": [
+          "Admin - Mail Queue"
+        ],
+        "summary": "Clean old jobs",
+        "description": "Remove old completed and failed jobs from the queue to free up Redis memory. Completed jobs older than 24h and failed jobs older than 7 days will be removed by default.",
+        "operationId": "cleanMailQueue",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "completed": {
+                    "type": "boolean",
+                    "description": "Clean completed jobs (default: true)",
+                    "example": true
+                  },
+                  "failed": {
+                    "type": "boolean",
+                    "description": "Clean failed jobs (default: true)",
+                    "example": true
+                  }
+                }
+              },
+              "examples": {
+                "cleanAll": {
+                  "summary": "Clean both completed and failed jobs",
+                  "value": {
+                    "completed": true,
+                    "failed": true
+                  }
+                },
+                "cleanCompletedOnly": {
+                  "summary": "Clean only completed jobs",
+                  "value": {
+                    "completed": true,
+                    "failed": false
+                  }
+                },
+                "cleanFailedOnly": {
+                  "summary": "Clean only failed jobs",
+                  "value": {
+                    "completed": false,
+                    "failed": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Queue cleaned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Queue cleaned successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "completed": {
+                          "type": "integer",
+                          "description": "Number of completed jobs removed",
+                          "example": 150
+                        },
+                        "failed": {
+                          "type": "integer",
+                          "description": "Number of failed jobs removed",
+                          "example": 3
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "List all users",
+        "description": "Retrieve all users with pagination",
+        "operationId": "getAllUsers",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/users/search": {
+      "get": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Search users",
+        "description": "Search users by email, username, or name",
+        "operationId": "searchUsers",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "john"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/users/stats": {
+      "get": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Get user statistics",
+        "description": "Retrieve comprehensive user statistics and metrics",
+        "operationId": "getUserStats",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/users/activity": {
+      "get": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Get recent user activity",
+        "description": "Retrieve recent user activities and actions",
+        "operationId": "getRecentActivity",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of activities to retrieve",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/users/export": {
+      "get": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Export users data",
+        "description": "Export users data in CSV or Excel format",
+        "operationId": "exportUsers",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Export format",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "csv",
+                "excel"
+              ],
+              "example": "csv"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File download",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/users/create": {
+      "post": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Create a new user",
+        "description": "Admin creates a new user account",
+        "operationId": "createUser",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "password_confirm",
+                  "first_name",
+                  "last_name",
+                  "role"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "PassWORD@2025"
+                  },
+                  "password_confirm": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "PassWORD@2025"
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "johndoe"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "USER",
+                      "ADMIN"
+                    ],
+                    "example": "USER"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreatedResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/users/find/{id}": {
+      "get": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Get user by ID",
+        "description": "Retrieve detailed user information",
+        "operationId": "getUserById",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID (MongoDB ObjectId)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/users/update/{id}": {
+      "put": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Update user",
+        "description": "Update user information",
+        "operationId": "updateUser",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "first_name": {
+                    "type": "string"
+                  },
+                  "last_name": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/users/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Deactivate user (soft delete)",
+        "description": "Soft delete user account (can be reactivated)",
+        "operationId": "deactivateUser",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/users/delete/{id}/permanent": {
+      "delete": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Permanently delete user",
+        "description": "Permanently delete user account (irreversible)",
+        "operationId": "permanentlyDeleteUser",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/users/reactivate/{id}": {
+      "put": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Reactivate user",
+        "description": "Reactivate a deactivated user account",
+        "operationId": "reactivateUser",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/users/role/{id}": {
+      "put": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Update user role",
+        "description": "Change user role (USER/ADMIN)",
+        "operationId": "updateUserRole",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "USER",
+                      "ADMIN"
+                    ],
+                    "example": "ADMIN"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/users/reset-password/{id}": {
+      "put": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Reset user password",
+        "description": "Admin resets a user password",
+        "operationId": "resetUserPassword",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "password",
+                  "password_confirm"
+                ],
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassWORD@2025"
+                  },
+                  "password_confirm": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassWORD@2025"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/users/force-logout/{id}": {
+      "post": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Force logout user",
+        "description": "Force user logout by invalidating all tokens",
+        "operationId": "forceLogoutUser",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/users/send-email/{id}": {
+      "post": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Send email to user",
+        "description": "Send a custom email to a specific user",
+        "operationId": "sendEmailToUser",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "subject",
+                  "message"
+                ],
+                "properties": {
+                  "subject": {
+                    "type": "string",
+                    "example": "Important notification"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Your account has been updated."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/users/bulk-email": {
+      "post": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Send bulk email",
+        "description": "Send email to multiple users",
+        "operationId": "sendBulkEmail",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_ids",
+                  "subject",
+                  "message"
+                ],
+                "properties": {
+                  "user_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "507f1f77bcf86cd799439011",
+                      "507f1f77bcf86cd799439012"
+                    ]
+                  },
+                  "subject": {
+                    "type": "string",
+                    "example": "System announcement"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Important system update notification."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/admin/x-api-key/find": {
+      "get": {
+        "tags": [
+          "Admin - API Keys"
+        ],
+        "summary": "Get current API key",
+        "description": "Retrieve the current X-API-Key configuration",
+        "operationId": "findApiKey",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "example": "xxxx-xxxx-xxxx-xxxx"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/admin/x-api-key/create": {
+      "post": {
+        "tags": [
+          "Admin - API Keys"
+        ],
+        "summary": "Create new API key",
+        "description": "Generate a new X-API-Key for the application",
+        "operationId": "createApiKey",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "description": "Optional description for the API key",
+                    "example": "Production API key"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "API key created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "API key created successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "example": "new-generated-api-key"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        }
+      }
+    },
+    "/admin/x-api-key/update": {
+      "put": {
+        "tags": [
+          "Admin - API Keys"
+        ],
+        "summary": "Update API key",
+        "description": "Regenerate or update the X-API-Key",
+        "operationId": "updateApiKey",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "regenerate": {
+                    "type": "boolean",
+                    "description": "Whether to regenerate a new key",
+                    "example": true
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Update the description",
+                    "example": "Updated API key description"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "API key updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "API key updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "example": "updated-api-key"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/app/upload/upload": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Upload single file",
+        "description": "Upload a single file to the server",
+        "operationId": "uploadFile",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "Optional metadata for the file",
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "File uploaded successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "filename": {
+                          "type": "string",
+                          "example": "file-1234567890.jpg"
+                        },
+                        "originalname": {
+                          "type": "string",
+                          "example": "photo.jpg"
+                        },
+                        "mimetype": {
+                          "type": "string",
+                          "example": "image/jpeg"
+                        },
+                        "size": {
+                          "type": "integer",
+                          "example": 102400
+                        },
+                        "path": {
+                          "type": "string",
+                          "example": "/uploads/file-1234567890.jpg"
+                        },
+                        "uploaded_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/app/upload/upload-multi": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Upload multiple files",
+        "description": "Upload multiple files at once",
+        "operationId": "uploadMultipleFiles",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "files"
+                ],
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Array of files to upload"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "Optional metadata for all files",
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Files uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Files uploaded successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "filename": {
+                            "type": "string"
+                          },
+                          "originalname": {
+                            "type": "string"
+                          },
+                          "mimetype": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "uploaded_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/app/upload/stats": {
+      "get": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Get upload statistics",
+        "description": "Retrieve statistics about uploaded files",
+        "operationId": "getUploadStats",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Start date for statistics (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "End date for statistics (ISO 8601)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "Filter by specific user",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total_files": {
+                          "type": "integer",
+                          "example": 150
+                        },
+                        "total_size": {
+                          "type": "integer",
+                          "example": 52428800
+                        },
+                        "files_by_type": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "integer"
+                          },
+                          "example": {
+                            "image/jpeg": 50,
+                            "application/pdf": 30
+                          }
+                        },
+                        "uploads_today": {
+                          "type": "integer",
+                          "example": 5
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/app/upload/delete": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Delete uploaded file",
+        "description": "Delete a previously uploaded file",
+        "operationId": "deleteUploadedFile",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file_id"
+                ],
+                "properties": {
+                  "file_id": {
+                    "type": "string",
+                    "description": "File ID to delete",
+                    "example": "507f1f77bcf86cd799439011"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/app/upload/info": {
+      "get": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Get file information",
+        "description": "Retrieve detailed information about an uploaded file",
+        "operationId": "getFileInfo",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": true,
+            "description": "File ID",
+            "schema": {
+              "type": "string",
+              "example": "507f1f77bcf86cd799439011"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "filename": {
+                          "type": "string"
+                        },
+                        "originalname": {
+                          "type": "string"
+                        },
+                        "mimetype": {
+                          "type": "string"
+                        },
+                        "size": {
+                          "type": "integer"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "uploader": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "metadata": {
+                          "type": "object"
+                        },
+                        "uploaded_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/app/user/profile": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update user profile",
+        "description": "Update current user profile information",
+        "operationId": "updateUserProfile",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "first_name": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "johndoe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john.doe@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/app/user/change-password": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Change password",
+        "description": "Change current user password",
+        "operationId": "changePassword",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "current_password",
+                  "new_password",
+                  "new_password_confirm"
+                ],
+                "properties": {
+                  "current_password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "CurrentPassWORD@2025"
+                  },
+                  "new_password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassWORD@2025",
+                    "description": "Must contain: lowercase, uppercase, digit, special char (3-30 chars)"
+                  },
+                  "new_password_confirm": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassWORD@2025"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/app/user/login-history": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get login history",
+        "description": "Retrieve login history for current user",
+        "operationId": "getLoginHistory",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of records to retrieve",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login history retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "login_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "ip_address": {
+                            "type": "string",
+                            "example": "192.168.1.1"
+                          },
+                          "user_agent": {
+                            "type": "string"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "Paris, France"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/app/user/logout-other-devices": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Logout from other devices",
+        "description": "Logout from all other devices except the current one",
+        "operationId": "logoutOtherDevices",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/app/user/account": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete account",
+        "description": "Delete (deactivate) current user account",
+        "operationId": "deleteAccount",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "password"
+                ],
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "Current password for confirmation",
+                    "example": "PassWORD@2025"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Optional reason for account deletion",
+                    "example": "No longer need the service"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/app/user/account/stats": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get account statistics",
+        "description": "Retrieve statistics and metrics for current user account",
+        "operationId": "getAccountStats",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total_logins": {
+                          "type": "integer",
+                          "example": 150
+                        },
+                        "last_login": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "account_age_days": {
+                          "type": "integer",
+                          "example": 365
+                        },
+                        "uploads_count": {
+                          "type": "integer",
+                          "example": 25
+                        },
+                        "storage_used": {
+                          "type": "integer",
+                          "example": 52428800
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/app/user/account/export": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Export user data",
+        "description": "Export all user data in JSON format (GDPR compliance)",
+        "operationId": "exportUserData",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User data export",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "profile": {
+                          "type": "object"
+                        },
+                        "login_history": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "uploads": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "activities": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "exported_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register a new user",
+        "description": "Create a new user account with email and password",
+        "operationId": "register",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "password_confirm",
+                  "first_name",
+                  "last_name"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "PassWORD@2025",
+                    "description": "Must contain: lowercase, uppercase, digit, special char (3-30 chars)"
+                  },
+                  "password_confirm": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "PassWORD@2025"
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "johndoe"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreatedResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/activate-account": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Activate user account",
+        "description": "Activate a user account using the OTP sent by email",
+        "operationId": "activateAccount",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "code": {
+                    "type": "string",
+                    "example": "123456",
+                    "description": "6-digit confirmation code"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "User login",
+        "description": "Authenticate user with email and password, returns JWT tokens",
+        "operationId": "login",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "PassWORD@2025"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Login successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        },
+                        "refresh_token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "first_name": {
+                              "type": "string"
+                            },
+                            "last_name": {
+                              "type": "string"
+                            },
+                            "role": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/verify-auth": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify authentication",
+        "description": "Verify if the current JWT token is valid",
+        "operationId": "verifyAuth",
+        "security": [
+          {
+            "apiKeyAuth": [],
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Refresh access token",
+        "description": "Get a new access token using refresh token",
+        "operationId": "refreshToken",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Refresh token code"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Request password reset",
+        "description": "Send password reset OTP to user email",
+        "operationId": "forgotPassword",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/verify-otp": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify OTP code",
+        "description": "Verify OTP code for password reset",
+        "operationId": "verifyOtp",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "code": {
+                    "type": "string",
+                    "example": "123456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "put": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Reset password",
+        "description": "Reset user password with verified OTP",
+        "operationId": "resetPassword",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "otp",
+                  "password",
+                  "password_confirm"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "example": "123456"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassWORD@2025"
+                  },
+                  "password_confirm": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "NewPassWORD@2025"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/its-not-me/{email}": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Report unauthorized activity",
+        "description": "Report unauthorized login attempt or account activity",
+        "operationId": "itsNotMe",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "description": "User email address",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/welcome/start": {
+      "get": {
+        "tags": [
+          "Index"
+        ],
+        "summary": "Welcome endpoint",
+        "description": "Returns a welcome message to verify API is running",
+        "operationId": "getWelcome",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key required for all endpoints"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token for authenticated endpoints"
+      }
+    },
+    "responses": {
+      "SuccessResponse": {
+        "description": "Successful operation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Operation successful"
+                },
+                "data": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreatedResponse": {
+        "description": "Resource created successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Resource created"
+                },
+                "data": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequestError": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Bad request"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "Unauthorized - Invalid or missing authentication",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden - Insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Forbidden"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Resource not found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Validation failed"
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "MailQueueStats": {
+        "type": "object",
+        "properties": {
+          "waiting": {
+            "type": "integer",
+            "description": "Jobs waiting to be processed"
+          },
+          "active": {
+            "type": "integer",
+            "description": "Jobs currently being processed"
+          },
+          "delayed": {
+            "type": "integer",
+            "description": "Jobs scheduled for later"
+          },
+          "completed": {
+            "type": "integer",
+            "description": "Successfully completed jobs"
+          },
+          "failed": {
+            "type": "integer",
+            "description": "Failed jobs"
+          }
+        }
+      },
+      "FailedMailJob": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Job ID"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "example": "mail"
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "receivers": {
+                    "type": "string",
+                    "description": "Email recipient(s)"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Email subject"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Template path or content"
+                  }
+                }
+              }
+            }
+          },
+          "failedReason": {
+            "type": "string",
+            "description": "Reason for failure"
+          },
+          "attemptsMade": {
+            "type": "integer",
+            "description": "Number of attempts made"
+          },
+          "timestamp": {
+            "type": "integer",
+            "description": "Job creation timestamp"
+          },
+          "processedOn": {
+            "type": "integer",
+            "description": "Last processing timestamp"
+          },
+          "finishedOn": {
+            "type": "integer",
+            "description": "Job completion timestamp"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Admin - Logs",
+      "description": "Admin endpoints for logs management and analytics"
+    },
+    {
+      "name": "Admin - Mail Queue",
+      "description": "Admin endpoints for managing the email queue. Monitor queue health, retry failed jobs, and perform maintenance tasks."
+    },
+    {
+      "name": "Admin - Users",
+      "description": "Admin endpoints for comprehensive user management"
+    },
+    {
+      "name": "Admin - API Keys",
+      "description": "Admin endpoints for X-API-Key management and regeneration"
+    },
+    {
+      "name": "Upload",
+      "description": "File upload and management endpoints"
+    },
+    {
+      "name": "User",
+      "description": "User profile management and account operations"
+    },
+    {
+      "name": "Authentication",
+      "description": "Authentication and authorization endpoints"
+    },
+    {
+      "name": "Index",
+      "description": "Welcome and health check endpoints"
+    }
+  ]
+}
