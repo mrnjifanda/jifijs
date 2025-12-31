@@ -110,6 +110,11 @@ export interface BaseDocument extends Document {
 export type TransactionCallback<T> = (session: ClientSession) => Promise<T>;
 
 /**
+ * Optional transaction callback function (supports both with and without session)
+ */
+export type TransactionOptionalCallback<T> = (session: ClientSession | null) => Promise<T>;
+
+/**
  * Field selection type
  */
 export type FieldSelection = string | string[] | Record<string, 0 | 1>;

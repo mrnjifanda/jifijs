@@ -98,27 +98,48 @@ Ensure you have the following installed:
 
 ### Installation
 
-1. Clone the repository
+There are two ways to get started with JifiJs:
+
+#### Option 1: Using npx (Recommended for new projects)
+
+Create a new project instantly with a single command:
 
 ```bash
-git clone https://github.com/mrnjifanda/jifijs.git
-cd jifijs
-```
+# Create a new project
+npx create-jifijs my-project
 
-2. Install dependencies
+# Navigate to project
+cd my-project
 
-```bash
-npm install
-```
-
-3. Configure environment
-
-```bash
+# Configure environment
 cp .env.example .env
 # Edit .env with your configuration
+
+# Start development server
+npm run dev
 ```
 
-4. Start the development server
+#### Option 2: Clone from GitHub (For contributors)
+
+Clone the repository directly:
+
+```bash
+# Clone repository
+git clone https://github.com/mrnjifanda/jifijs.git my-project
+cd my-project
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start development server
+npm run dev
+```
+
+#### Quick Start Commands
 
 ```bash
 # Development mode with hot reload
@@ -132,6 +153,9 @@ npm start
 
 # Run test suite
 npm test
+
+# Generate code
+npm run g resource product
 ```
 
 Server will be available at `http://localhost:3000` (or your configured PORT)

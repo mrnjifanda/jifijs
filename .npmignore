@@ -1,0 +1,38 @@
+# Development
+tests/
+coverage/
+*.test.ts
+*.test.js
+.env
+.env.*
+
+# Build
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Packages (published separately)
+packages/
+
+# Misc
+.DS_Store
+Thumbs.db
+BUILD_FIXES.md
+PUBLISHING.md

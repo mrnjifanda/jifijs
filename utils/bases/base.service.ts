@@ -11,7 +11,8 @@ import logger from '../helpers/logger.helper';
 import cacheService from '../helpers/cache.helper';
 import {
     QueryOptionsExtended,
-    TransactionCallback
+    TransactionCallback,
+    TransactionOptionalCallback
 } from '../../src/types';
 
 /**
@@ -983,6 +984,85 @@ class BaseService<T extends Document> {
     }
 
     /**
+     * Executes operations with optional transaction support.
+     * Uses transactions if available (replica set), otherwise executes sequentially.
+     * Safe for both development and production environments.
+     *
+     * @param {TransactionOptionalCallback<any>} callback - Async function receiving session or null as parameter.
+     * @param {Model<T>|null} [model=null] - Specific model to use.
+     * @returns {Promise<QueryResult<any>>}
+     *
+     * @example
+     * await service.transactionOptional(async (session) => {
+     *   await service.create({ name: 'Test' }, null, session);
+     *   await service.update({ _id: id }, { status: 'active' }, null, session);
+     *   return { success: true };
+     * });
+     */
+    async transactionOptional<R = any>(
+        callback: TransactionOptionalCallback<R>,
+        model: Model<T> | null = null
+    ): Promise<QueryResult<R>> {
+        let session: ClientSession | null = null;
+        let useTransaction = false;
+
+        try {
+            // Try to start a session
+            session = await this.getModel(model).db.startSession();
+
+            // Try to start a transaction
+            session.startTransaction();
+            useTransaction = true;
+
+            const result = await callback(session);
+            await session.commitTransaction();
+
+            return { error: false, data: result };
+        } catch (err: any) {
+            // If transaction failed due to replica set requirement
+            if (err.message?.includes('Transaction numbers are only allowed on a replica set') ||
+                err.codeName === 'NotWritablePrimary' ||
+                err.code === 20) {
+
+                logger.warn('Transactions not supported (no replica set). Executing without transaction.');
+
+                // Execute without transaction
+                if (session && useTransaction) {
+                    await session.abortTransaction();
+                }
+
+                try {
+                    const result = await callback(null);
+                    return { error: false, data: result };
+                } catch (callbackErr: any) {
+                    logger.error('Error executing without transaction:', callbackErr);
+                    return {
+                        error: true,
+                        message: callbackErr.message,
+                        name: callbackErr.name
+                    };
+                }
+            }
+
+            // Other errors
+            if (session && useTransaction) {
+                await session.abortTransaction();
+            }
+
+            logger.error('Transaction error:', err);
+            return {
+                error: true,
+                message: err.message,
+                name: err.name
+            };
+        } finally {
+            if (session) {
+                session.endSession();
+            }
+        }
+    }
+
+    /**
      * Bulk write operations for better performance.
      *
      * @param {Array<any>} operations - Array of bulk operations.
@@ -1083,10 +1163,6 @@ class BaseService<T extends Document> {
             };
         }
     }
-
-    // ============================================
-    // CACHE METHODS
-    // ============================================
 
     /**
      * Get value from cache

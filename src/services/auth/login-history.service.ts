@@ -201,7 +201,7 @@ class LoginHistoryService extends BaseService<ILoginHistory> {
         { $match: { user: userId } },
         {
           $group: {
-            _id: null,
+            _id: null as null,
             total_logins: { $sum: 1 },
             unique_ips: { $addToSet: '$ip' },
             last_login: { $max: '$login_at' },

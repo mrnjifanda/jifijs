@@ -61,7 +61,7 @@ class LogsService extends BaseService<ILog> {
         { $match: filters },
         {
           $group: {
-            _id: null,
+            _id: null as null,
             total_requests: { $sum: 1 },
             avg_response_time: { $avg: '$execution_time' },
             total_errors: {

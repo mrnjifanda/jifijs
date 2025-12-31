@@ -44,8 +44,8 @@ class AuthController extends BaseController {
     const data = response.data!;
     return super.success(
       res,
-      'User created successfully',
-      { otp: data.otp, email: data.user.email },
+      'User created successfully, you will receive instructions to activate your account by email.',
+      { email: data.user.email },
       201
     );
   }

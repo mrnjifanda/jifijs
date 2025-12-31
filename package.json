@@ -1,13 +1,45 @@
 {
-  "name": "@mrnjifanda/jifijs",
-  "version": "1.0.0",
+  "name": "jifijs",
+  "version": "0.1.0",
+  "main": "dist/main.js",
+  "types": "dist/main.d.ts",
+  "author": "Mr NJIFANDA",
+  "license": "OSL-3.0",
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "utils/**/*",
+    "configs/**/*",
+    "routes/**/*",
+    "templates/**/*",
+    "bin/**/*",
+    "docs/**/*",
+    "public/**/*",
+    "main.ts",
+    "routes.ts",
+    "tsconfig.json",
+    "tsconfig.build.json",
+    "jest.config.js",
+    ".env.example",
+    ".eslintrc.js",
+    ".gitignore",
+    "README.md",
+    "LICENSE.txt",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "description": "Project base to create an API with Node.js, Express and MongoDB. The code supports authentication and logging. You can follow us on: [Mr NJIFANDA](http://www.njifanda.com)",
-  "main": "main.js",
   "scripts": {
     "g": "node ./bin/cli",
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "build:watch": "tsc --watch",
+    "prepublishOnly": "npm run type-check && npm run build",
     "prod": "cross-env NODE_ENV=PRODUCTION node dist/main.js",
     "dev": "cross-env NODE_ENV=DEVELOPMENT ts-node-dev --respawn --transpile-only main.ts",
     "start": "npm run build && npm run prod",
@@ -27,9 +59,24 @@
     "mail-queue:monitor": "ts-node bin/mail-queue.ts monitor",
     "mail-queue:help": "ts-node bin/mail-queue.ts help"
   },
-  "keywords": [],
-  "author": "Mr NJIFANDA",
-  "license": "OSL-3.0",
+  "keywords": [
+    "express",
+    "typescript",
+    "api",
+    "framework",
+    "authentication",
+    "jwt",
+    "mongodb",
+    "redis",
+    "rest-api"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/main.js",
+      "import": "./dist/main.js",
+      "types": "./dist/main.d.ts"
+    }
+  },
   "dependencies": {
     "bcrypt": "^5.1.0",
     "bull": "^4.12.2",
@@ -51,6 +98,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^6.9.13",
     "os": "^0.1.2",
+    "prompts": "^2.4.2",
     "rate-limit-redis": "^4.2.2",
     "request-ip": "^3.3.0",
     "user-agent-parser": "^0.6.0",
@@ -77,6 +125,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^20.12.7",
     "@types/nodemailer": "^6.4.15",
+    "@types/prompts": "^2.4.9",
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",

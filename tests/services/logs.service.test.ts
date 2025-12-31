@@ -61,10 +61,10 @@ describe('LogsService', () => {
             await logsService.create({ id: '2', method: 'POST', url: '/fail', status_code: 500, action: LogAction.CREATE, user: user._id } as any);
 
             const errorLogs = await logsService.getErrorLogs();
-            // This is tricky because base.service find returns a full object
+            // getErrorLogs returns ServiceResponse<ILog[]>, so data is directly an array
             expect(errorLogs.error).toBe(false);
-            expect(errorLogs.data.content.length).toBe(1);
-            expect(errorLogs.data.content[0].status_code).toBe(500);
+            expect(errorLogs.data.length).toBe(1);
+            expect(errorLogs.data[0].response.statusCode).toBe(500);
         });
     });
 

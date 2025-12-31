@@ -6,11 +6,7 @@ import * as authMiddleware from '../utils/middlewares/auth/auth.middleware';
 const router = Router();
 
 router.post('/register', authValidation.register, authController.register);
-router.post(
-  '/activate-account',
-  authValidation.activate_account,
-  authController.activate_account
-);
+router.post('/activate-account', authValidation.activate_account, authController.activate_account);
 
 router.post('/login', authValidation.login, authController.login);
 router.post('/verify-auth', authMiddleware.isLogin, authController.isLogin);

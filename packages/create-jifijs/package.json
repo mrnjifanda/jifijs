@@ -1,0 +1,52 @@
+{
+  "name": "create-jifijs",
+  "version": "0.1.0",
+  "description": "Create a new JifiJs project",
+  "author": "Mr NJIFANDA",
+  "license": "OSL-3.0",
+  "type": "module",
+  "bin": {
+    "create-jifijs": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "jifijs",
+    "express",
+    "typescript",
+    "api",
+    "framework",
+    "boilerplate",
+    "template",
+    "create-app"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrnjifanda/jifijs.git",
+    "directory": "packages/create-jifijs"
+  },
+  "bugs": {
+    "url": "https://github.com/mrnjifanda/jifijs/issues"
+  },
+  "homepage": "https://github.com/mrnjifanda/jifijs#readme",
+  "dependencies": {
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.4.5"
+  }
+}

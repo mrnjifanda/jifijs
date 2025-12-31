@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import cacheService from '../utils/helpers/cache.helper';
+import tokenBlacklist from '../utils/bases/blackList.service';
 
 let mongoServer: MongoMemoryServer;
 
@@ -50,6 +52,10 @@ afterEach(async () => {
 
 afterAll(async () => {
     try {
+        // Clean up intervals and timers
+        await cacheService.shutdown();
+        tokenBlacklist.destroy();
+
         if (mongoose.connection.readyState !== 0) {
             await mongoose.disconnect();
         }

@@ -102,7 +102,6 @@ function setupRateLimit(): void {
   const rateLimitMiddleware = rateLimitConfig.init();
   if (rateLimitMiddleware) {
     app.use(rateLimitMiddleware);
-    logger.info('✅ Rate limiting enabled');
   }
 }
 
@@ -246,6 +245,7 @@ function setupProcessHandlers(server: Server): void {
  * @private
  */
 function initializeApp(): void {
+
   if (configs.use('database')) {
     db.connect(configs.getDatabase());
   }
@@ -257,7 +257,6 @@ function initializeApp(): void {
   setupRoutes();
 
   setupSwagger(app);
-
   setupErrorHandlers();
 }
 

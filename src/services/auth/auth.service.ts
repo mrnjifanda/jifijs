@@ -151,6 +151,7 @@ class AuthService extends BaseService<IAuth> {
     active: boolean = false,
     login_history: Partial<LoginHistory> = {}
   ): Promise<ServiceResponse<LoginResult> | LoginResponse> {
+
     if (!data || !data.email || !data.password) {
       return { error: true, message: 'Email and password are required' };
     }
@@ -185,7 +186,6 @@ class AuthService extends BaseService<IAuth> {
     const token = super.token({ id: user._id.toString() }, '1h') as string;
     const refresh_token = super.token({ id: user._id.toString() }, '7d') as string;
 
-    // Save login history to separate collection
     await loginHistoryService.createLoginHistory({
       auth: auth!._id.toString(),
       user: user._id.toString(),
@@ -314,6 +314,7 @@ class AuthService extends BaseService<IAuth> {
     data: any,
     token: OTPOptions = { type: 'numeric', length: 6 }
   ): Promise<ServiceResponse<RegisterResult>> {
+
     const findUser = await userService.findOne({ email: new RegExp(data.email, 'i') });
     if (findUser.error || findUser.data) {
       return { error: true, message: 'This email is already in use' };
@@ -324,32 +325,53 @@ class AuthService extends BaseService<IAuth> {
       return { error: true, message: 'Password hashing failed' };
     }
 
-    const { role, last_name, first_name, username, email } = data;
-
-    const user = await userService.create({ last_name, first_name, username, email, password });
-    if (user.error) {
-      return user as ServiceError;
-    }
-
     const confirmation_token = this.generateOTP(token);
-    const auth = await super.create({
-      user: user.data!._id,
-      passwords: [password as string],
-      confirmation_token,
-      role,
-    } as any);
-
-    if (auth.error) {
-      return auth as ServiceError;
+    const hash_confirmation_token = await super.hash(confirmation_token);
+    if (!hash_confirmation_token) {
+      return { error: true, message: 'Confirmation token hashing failed' };
     }
 
-    super
-      .mail()
-      .sendWithQueue(email, 'OTP verification', 'auth/register-otp', { otp: confirmation_token });
+    const { role, last_name, first_name, username, email } = data;
+    const transactionResult = await super.transactionOptional(async (session) => {
+      const user = await userService.create(
+        { last_name, first_name, username, email, password },
+        null,
+        session
+      );
+
+      if (user.error) {
+        throw new Error(user.message || 'User creation failed');
+      }
+
+      const auth = await super.create(
+        {
+          user: user.data!._id,
+          passwords: [password as string],
+          confirmation_token: hash_confirmation_token,
+          role,
+        } as any,
+        null,
+        session
+      );
+
+      if (auth.error) {
+        throw new Error(auth.message || 'Auth creation failed');
+      }
+
+      return { user: user.data!, auth: auth.data };
+    });
+
+    if (transactionResult.error) {
+      return { error: true, message: transactionResult.message || 'Registration failed' };
+    }
+
+    super.mail().sendWithQueue(email, 'OTP verification', 'auth/register-otp', {
+      otp: confirmation_token
+    });
 
     return {
       error: false,
-      data: { otp: confirmation_token, user: user.data! },
+      data: { otp: confirmation_token, user: transactionResult.data!.user },
     };
   }
 
@@ -359,40 +381,45 @@ class AuthService extends BaseService<IAuth> {
    * @returns Activation result
    */
   async activateAccount(data: { email: string; code: string }): Promise<ServiceResponse<null>> {
-    const response: ServiceError = { error: true, message: 'This account not found' };
 
-    const find_auth = await super.findOne(
-      { confirmation_token: data.code },
-      {
-        select: 'confirmation_token, confirmed_at',
-        populate: { path: 'user', select: 'email username' },
-      }
+    const errorResponse: ServiceError = { error: true, message: 'Invalid email or activation code' };
+    const findUser = await userService.findOne(
+      { email: new RegExp(data.email, 'i') },
+      { select: '_id username email' }
     );
 
-    if (
-      find_auth.error ||
-      !find_auth.data ||
-      !(find_auth.data as any).user ||
-      !(find_auth.data as any).user.email
-    ) {
-      return response;
-    }
+    if (findUser.error || !findUser.data) return errorResponse;
+
+    const user = findUser.data;
+    const find_auth = await super.findOne(
+      { user: user._id },
+      { select: 'confirmation_token, confirmed_at' }
+    );
+
+    if (find_auth.error || !find_auth.data) return errorResponse;
 
     const auth = find_auth.data as any;
-
-    if (data.email.toLowerCase() !== auth.user.email.toLowerCase()) {
-      return response;
+    if (auth.confirmed_at !== null) {
+      return { error: true, message: 'Account is already activated' };
     }
 
+    if (!auth.confirmation_token) {
+      return { error: true, message: 'No activation code found for this account' };
+    }
+
+    const isValidCode = await super.hashCompare(data.code, auth.confirmation_token);
+    if (!isValidCode) {
+      return { error: true, message: 'Invalid activation code' };
+    }
+
+    // Activate account
     auth.confirmation_token = null;
     auth.confirmed_at = new Date();
     await auth.save();
 
-    super
-      .mail()
-      .sendWithQueue(data.email, 'Account activation successful', 'auth/activation', {
-        user: auth.user,
-      });
+    super.mail().sendWithQueue(data.email, 'Account activation successful', 'auth/activation', {
+      user,
+    });
 
     return { error: false, data: null, message: 'Account activated successfully' };
   }
@@ -410,7 +437,15 @@ class AuthService extends BaseService<IAuth> {
     }
 
     const reset_password_token = this.generateOTP({ type: 'numeric', length: 10 });
-    const update = await super.update({ user: findUser.data._id }, { reset_password_token } as any);
+    const hash_reset_password_token = await super.hash(reset_password_token);
+    if (!hash_reset_password_token) {
+      return { error: true, message: 'Failed to generate reset token' };
+    }
+
+    const update = await super.update(
+      { user: findUser.data._id },
+      { reset_password_token: hash_reset_password_token } as any
+    );
 
     if (update.error) {
       return { error: true, message: 'An error occurred, please try again later!!!' };
@@ -430,25 +465,39 @@ class AuthService extends BaseService<IAuth> {
    * @returns Verification result with auth data
    */
   async verifyOtp(email: string, code: string): Promise<ServiceResponse<any>> {
-    const errorResponse: ServiceError = { error: true, message: 'Email or code not valide' };
 
+    const errorResponse: ServiceError = { error: true, message: 'Invalid email or reset code' };
     try {
-      const find_auth = await super.findOne(
-        { reset_password_token: code },
-        {
-          select: 'passwords, confirmed_at, reset_password_token, reset_password_at',
-          populate: { path: 'user', select: 'email password' },
-        }
+
+      const findUser = await userService.findOne(
+        { email: new RegExp(email, 'i') },
+        { select: '_id email password' }
       );
 
+      if (findUser.error || !findUser.data) return errorResponse;
+
+      const user = findUser.data;
+      const find_auth = await super.findOne({ user: user._id }, {
+        select: 'passwords, confirmed_at, reset_password_token, reset_password_at',
+      });
+
+      if (find_auth.error || !find_auth.data) return errorResponse;
+
       const auth = find_auth.data as any;
-      if (find_auth.error || auth?.confirmed_at === null) {
-        return errorResponse;
+      if (auth.confirmed_at === null) {
+        return { error: true, message: 'Account is not activated' };
       }
 
-      if (!auth.user.email || auth.user.email.toLowerCase() !== email.toLowerCase()) {
-        return errorResponse;
+      if (!auth.reset_password_token) {
+        return { error: true, message: 'No reset code found. Please request a new one.' };
       }
+
+      const isValidCode = await super.hashCompare(code, auth.reset_password_token);
+      if (!isValidCode) {
+        return { error: true, message: 'Invalid reset code' };
+      }
+
+      auth.user = user;
 
       return { error: false, message: 'OTP verification successful', data: auth };
     } catch (error) {
