@@ -1,6 +1,6 @@
 {
   "name": "jifijs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "Mr NJIFANDA",
@@ -15,11 +15,13 @@
     "bin/**/*",
     "docs/**/*",
     "public/**/*",
+    "tests/**/*",
     "main.ts",
     "routes.ts",
     "tsconfig.json",
     "tsconfig.build.json",
     "jest.config.js",
+    "docker-compose.yml",
     ".env.example",
     ".eslintrc.js",
     ".gitignore",
@@ -111,7 +113,7 @@
   "bugs": {
     "url": "https://github.com/mrnjifanda/jifijs/issues"
   },
-  "homepage": "https://github.com/mrnjifanda/jifijs#readme",
+  "homepage": "https://jifijs.njifanda.com",
   "devDependencies": {
     "@faker-js/faker": "^9.6.0",
     "@types/bcrypt": "^5.0.2",

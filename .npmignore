@@ -8,6 +8,7 @@ coverage/
 
 # Build
 node_modules/
+public/upload/
 
 # IDE
 .vscode/

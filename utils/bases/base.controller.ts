@@ -6,6 +6,7 @@ import { response } from '../../configs/app.config';
  * All controllers should extend this class
  */
 class BaseController {
+
   /**
    * Send success response
    * @param res - Express response object

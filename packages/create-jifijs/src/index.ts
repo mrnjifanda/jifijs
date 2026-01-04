@@ -9,13 +9,16 @@ import pc from 'picocolors';
 interface PromptResult {
   projectName?: string;
   shouldOverwrite?: boolean;
+  includeTests?: boolean;
+  includeDocker?: boolean;
+  installDeps?: boolean;
 }
 
 async function init() {
   console.log();
   console.log(pc.cyan('  ╔═══════════════════════════════════╗'));
   console.log(pc.cyan('  ║                                   ║'));
-  console.log(pc.cyan('  ║     ') + pc.bold(pc.white('Create JifiJs Project')) + pc.cyan('      ║'));
+  console.log(pc.cyan('  ║        ') + pc.bold(pc.white('Create JifiJs Project')) + pc.cyan('      ║'));
   console.log(pc.cyan('  ║                                   ║'));
   console.log(pc.cyan('  ╚═══════════════════════════════════╝'));
   console.log();
@@ -70,36 +73,61 @@ async function init() {
     fs.rmSync(root, { recursive: true, force: true });
   }
 
-  // Create project directory
-  console.log(pc.green(`\n✓ Creating project in ${pc.cyan(root)}...`));
+  // Ask user preferences
+  const preferences = await prompts([
+    {
+      type: 'confirm',
+      name: 'includeTests',
+      message: 'Include tests?',
+      initial: true
+    },
+    {
+      type: 'confirm',
+      name: 'includeDocker',
+      message: 'Include docker-compose.yml?',
+      initial: true
+    },
+    {
+      type: 'confirm',
+      name: 'installDeps',
+      message: 'Install dependencies now?',
+      initial: true
+    }
+  ]);
+
   fs.mkdirSync(root, { recursive: true });
 
   // Install jifijs template
   console.log(pc.green('\n✓ Downloading JifiJs template...'));
-  await installTemplate(root);
+  await installTemplate(root, preferences);
 
   // Update package.json
   console.log(pc.green('\n✓ Configuring package.json...'));
-  updatePackageJson(root, targetDir);
+  updatePackageJson(root, targetDir, preferences);
 
   // Create .env from .env.example
   console.log(pc.green('\n✓ Creating .env file...'));
   createEnvFile(root);
 
   // Install dependencies
-  console.log(pc.green('\n✓ Installing dependencies...'));
-  console.log(pc.dim('  This might take a few minutes...'));
-  await installDependencies(root);
+  if (preferences.installDeps) {
+    console.log(pc.green('\n✓ Installing dependencies...'));
+    console.log(pc.dim('  This might take a few minutes...'));
+    await installDependencies(root);
+  } else {
+    console.log(pc.yellow('\n⊘ Skipping dependency installation'));
+  }
 
   // Initialize git
   console.log(pc.green('\n✓ Initializing git repository...'));
   await initGit(root);
 
   // Success message
-  printSuccessMessage(targetDir);
+  printSuccessMessage(targetDir, preferences.installDeps, preferences);
 }
 
-async function installTemplate(root: string): Promise<void> {
+async function installTemplate(root: string, preferences: PromptResult): Promise<void> {
+
   return new Promise((resolve, reject) => {
     const install = spawn('npm', ['install', 'jifijs', '--no-save'], {
       cwd: root,
@@ -121,7 +149,7 @@ async function installTemplate(root: string): Promise<void> {
       }
 
       // Copy all files except node_modules and dist
-      copyTemplateFiles(templatePath, root);
+      copyTemplateFiles(templatePath, root, preferences);
 
       // Remove node_modules/jifijs
       fs.rmSync(path.join(root, 'node_modules'), { recursive: true, force: true });
@@ -133,28 +161,50 @@ async function installTemplate(root: string): Promise<void> {
   });
 }
 
-function copyTemplateFiles(src: string, dest: string) {
+function copyTemplateFiles(src: string, dest: string, preferences: PromptResult) {
   const entries = fs.readdirSync(src, { withFileTypes: true });
+
+  // Files to always exclude
+  const excludedFiles = [
+    'dist',
+    'coverage',
+    'node_modules',
+    'package-lock.json',
+    'CHANGELOG.md',
+    'CONTRIBUTING.md',
+    'SECURITY.md',
+    '.npmignore'
+  ];
 
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
 
-    // Skip node_modules, dist, and package-lock.json
-    if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'package-lock.json') {
+    // Skip excluded files
+    if (excludedFiles.includes(entry.name)) {
+      continue;
+    }
+
+    // Skip tests if user doesn't want them
+    if (!preferences.includeTests && (entry.name === 'tests' || entry.name === 'jest.config.js')) {
+      continue;
+    }
+
+    // Skip docker-compose if user doesn't want it
+    if (!preferences.includeDocker && entry.name === 'docker-compose.yml') {
       continue;
     }
 
     if (entry.isDirectory()) {
       fs.mkdirSync(destPath, { recursive: true });
-      copyTemplateFiles(srcPath, destPath);
+      copyTemplateFiles(srcPath, destPath, preferences);
     } else {
       fs.copyFileSync(srcPath, destPath);
     }
   }
 }
 
-function updatePackageJson(root: string, projectName: string) {
+function updatePackageJson(root: string, projectName: string, preferences: PromptResult) {
   const pkgPath = path.join(root, 'package.json');
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
 
@@ -166,6 +216,13 @@ function updatePackageJson(root: string, projectName: string) {
   // Remove scripts that are only for template development
   if (pkg.scripts) {
     delete pkg.scripts.prepublishOnly;
+
+    if (!preferences.includeTests) {
+      delete pkg.scripts.test;
+      delete pkg.scripts["test:watch"];
+      delete pkg.scripts["test:coverage"];
+      delete pkg.scripts["test:verbose"];
+    }
   }
 
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
@@ -224,7 +281,7 @@ async function initGit(root: string): Promise<void> {
   });
 }
 
-function printSuccessMessage(projectName: string) {
+function printSuccessMessage(projectName: string, depsInstalled: boolean = true, preferences: PromptResult) {
   console.log();
   console.log(pc.green('  ✓ ') + pc.bold('Project created successfully!'));
   console.log();
@@ -233,11 +290,20 @@ function printSuccessMessage(projectName: string) {
   console.log('  1. Navigate to your project:');
   console.log(pc.dim('     $ ') + pc.cyan(`cd ${projectName}`));
   console.log();
-  console.log('  2. Configure your environment:');
+
+  if (!depsInstalled) {
+    console.log('  2. Install dependencies:');
+    console.log(pc.dim('     $ ') + pc.cyan('npm install'));
+    console.log();
+    console.log('  3. Configure your environment:');
+  } else {
+    console.log('  2. Configure your environment:');
+  }
+
   console.log(pc.dim('     $ ') + pc.cyan('nano .env'));
   console.log(pc.dim('     ') + pc.dim('(Update MongoDB, Redis, JWT secrets, etc.)'));
   console.log();
-  console.log('  3. Start development server:');
+  console.log(`  ${!depsInstalled ? '4' : '3'}. Start development server:`);
   console.log(pc.dim('     $ ') + pc.cyan('npm run dev'));
   console.log();
   console.log(pc.cyan('  Documentation:'));
@@ -247,7 +313,11 @@ function printSuccessMessage(projectName: string) {
   console.log(pc.dim('     $ ') + 'npm run dev' + pc.dim('         - Start development server'));
   console.log(pc.dim('     $ ') + 'npm run build' + pc.dim('       - Build for production'));
   console.log(pc.dim('     $ ') + 'npm start' + pc.dim('           - Run production server'));
-  console.log(pc.dim('     $ ') + 'npm test' + pc.dim('            - Run tests'));
+
+  if (preferences.includeTests) {
+    console.log(pc.dim('     $ ') + 'npm test' + pc.dim('            - Run tests'));
+  }
+
   console.log(pc.dim('     $ ') + 'npm run g resource <name>' + pc.dim(' - Generate code'));
   console.log();
   console.log(pc.green('  Happy coding! 🚀'));

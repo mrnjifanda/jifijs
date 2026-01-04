@@ -15,3 +15,4 @@ logs/
 package-lock.json
 
 dist/
+public/upload/
