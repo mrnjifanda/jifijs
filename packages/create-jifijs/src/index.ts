@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { spawn } from 'child_process';
-import fs from 'fs';
-import path from 'path';
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import prompts from 'prompts';
 import pc from 'picocolors';
 
@@ -11,7 +11,6 @@ interface PromptResult {
   shouldOverwrite?: boolean;
   includeTests?: boolean;
   includeDocker?: boolean;
-  installDeps?: boolean;
 }
 
 async function init() {
@@ -78,19 +77,13 @@ async function init() {
     {
       type: 'confirm',
       name: 'includeTests',
-      message: 'Include tests?',
+      message: 'Include tests ?',
       initial: true
     },
     {
       type: 'confirm',
       name: 'includeDocker',
-      message: 'Include docker-compose.yml?',
-      initial: true
-    },
-    {
-      type: 'confirm',
-      name: 'installDeps',
-      message: 'Install dependencies now?',
+      message: 'Include Docker (docker-compose.yml) ?',
       initial: true
     }
   ]);
@@ -109,21 +102,8 @@ async function init() {
   console.log(pc.green('\n✓ Creating .env file...'));
   createEnvFile(root);
 
-  // Install dependencies
-  if (preferences.installDeps) {
-    console.log(pc.green('\n✓ Installing dependencies...'));
-    console.log(pc.dim('  This might take a few minutes...'));
-    await installDependencies(root);
-  } else {
-    console.log(pc.yellow('\n⊘ Skipping dependency installation'));
-  }
-
-  // Initialize git
-  console.log(pc.green('\n✓ Initializing git repository...'));
-  await initGit(root);
-
   // Success message
-  printSuccessMessage(targetDir, preferences.installDeps, preferences);
+  printSuccessMessage(targetDir, preferences);
 }
 
 async function installTemplate(root: string, preferences: PromptResult): Promise<void> {
@@ -237,51 +217,8 @@ function createEnvFile(root: string) {
   }
 }
 
-async function installDependencies(root: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const install = spawn('npm', ['install'], {
-      cwd: root,
-      stdio: 'inherit'
-    });
 
-    install.on('close', (code) => {
-      if (code !== 0) {
-        reject(new Error('Failed to install dependencies'));
-        return;
-      }
-      resolve();
-    });
-
-    install.on('error', reject);
-  });
-}
-
-async function initGit(root: string): Promise<void> {
-  return new Promise((resolve) => {
-    const git = spawn('git', ['init'], {
-      cwd: root,
-      stdio: 'pipe'
-    });
-
-    git.on('close', () => {
-      // Add initial commit
-      const add = spawn('git', ['add', '.'], { cwd: root, stdio: 'pipe' });
-      add.on('close', () => {
-        const commit = spawn('git', ['commit', '-m', 'Initial commit from create-jifijs'], {
-          cwd: root,
-          stdio: 'pipe'
-        });
-        commit.on('close', () => resolve());
-        commit.on('error', () => resolve()); // Don't fail if git commit fails
-      });
-      add.on('error', () => resolve());
-    });
-
-    git.on('error', () => resolve()); // Don't fail if git is not installed
-  });
-}
-
-function printSuccessMessage(projectName: string, depsInstalled: boolean = true, preferences: PromptResult) {
+function printSuccessMessage(projectName: string, preferences: PromptResult) {
   console.log();
   console.log(pc.green('  ✓ ') + pc.bold('Project created successfully!'));
   console.log();
@@ -290,20 +227,14 @@ function printSuccessMessage(projectName: string, depsInstalled: boolean = true,
   console.log('  1. Navigate to your project:');
   console.log(pc.dim('     $ ') + pc.cyan(`cd ${projectName}`));
   console.log();
-
-  if (!depsInstalled) {
-    console.log('  2. Install dependencies:');
-    console.log(pc.dim('     $ ') + pc.cyan('npm install'));
-    console.log();
-    console.log('  3. Configure your environment:');
-  } else {
-    console.log('  2. Configure your environment:');
-  }
-
+  console.log('  2. Install dependencies:');
+  console.log(pc.dim('     $ ') + pc.cyan('npm install'));
+  console.log();
+  console.log('  3. Configure your environment:');
   console.log(pc.dim('     $ ') + pc.cyan('nano .env'));
   console.log(pc.dim('     ') + pc.dim('(Update MongoDB, Redis, JWT secrets, etc.)'));
   console.log();
-  console.log(`  ${!depsInstalled ? '4' : '3'}. Start development server:`);
+  console.log('  4. Start development server:');
   console.log(pc.dim('     $ ') + pc.cyan('npm run dev'));
   console.log();
   console.log(pc.cyan('  Documentation:'));
